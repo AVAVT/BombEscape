@@ -1,7 +1,7 @@
 const BOARD_WIDTH = 31;
 const BOARD_HEIGHT = 31;
 const MIN_BOMBS_PER_TURN = 3;
-const DIFFICULTY_INCREASE_INTERVAL = 5;
+const DIFFICULTY_INCREASE_INTERVAL = 7;
 
 const Directions = {
   UP: "UP",
@@ -50,24 +50,24 @@ const doMove = (playerPosition, move) => {
     case Directions.UP:
       return playerPosition.y > 0
         ? Object.assign({}, playerPosition, { y: playerPosition.y - 1 })
-        : playerPosition;
+        : Object.assign({}, playerPosition, { y: BOARD_HEIGHT - 1 });
     case Directions.DOWN:
       return playerPosition.y < BOARD_HEIGHT - 1
         ? Object.assign({}, playerPosition, { y: playerPosition.y + 1 })
-        : playerPosition;
+        : Object.assign({}, playerPosition, { y: 0 });
     case Directions.LEFT:
       return playerPosition.x > 0
         ? Object.assign({}, playerPosition, { x: playerPosition.x - 1 })
-        : playerPosition;
+        : Object.assign({}, playerPosition, { x: BOARD_WIDTH - 1 });
     case Directions.RIGHT:
       return playerPosition.x < BOARD_WIDTH - 1
         ? Object.assign({}, playerPosition, { x: playerPosition.x + 1 })
-        : playerPosition;
+        : Object.assign({}, playerPosition, { x: 0 });
     default: return playerPosition;
   }
 }
 
-const createBombs = (currentBombs, numberToCreate, boardWidth, boardHeight) => {
+const createBombs = (currentBombs, playerPos, numberToCreate, boardWidth, boardHeight) => {
   const possiblePosisions = Array.from({ length: boardWidth * boardHeight })
     .map((item, index) => ({
       timer: 2,
@@ -75,7 +75,7 @@ const createBombs = (currentBombs, numberToCreate, boardWidth, boardHeight) => {
       y: index / boardWidth
     }))
     .filter(
-      position => currentBombs.every(bomb => bomb.x !== position.x && bomb.y !== position.y)
+      position => currentBombs.every(bomb => bomb.x !== position.x && bomb.y !== position.y) && playerPos.x !== position.x && playerPos.y !== position.y
     );
   return knuthShuffle(possiblePosisions).slice(0, Math.min(numberToCreate, possiblePosisions.length));
 }
