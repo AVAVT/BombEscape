@@ -27,7 +27,9 @@ const initialState = {
 class App extends Component {
   state = {
     gameState: initialState,
-    turn: 0
+    history: [],
+    turn: 0,
+    viewingTurn: 0
   };
 
   componentDidMount() {
@@ -35,9 +37,12 @@ class App extends Component {
   }
 
   doTurn = () => {
+    const newState = update(this.state.gameState, this.state.turn, doTurn(this.state.gameState));
     this.setState({
-      gameState: update(this.state.gameState, this.state.turn, doTurn(this.state.gameState)),
-      turn: this.state.turn + 1
+      history: [...this.state.history, newState],
+      gameState: newState,
+      turn: this.state.turn + 1,
+      viewingTurn: this.state.turn + 1
     }, () => {
       if (this.state.gameState.gameOver) {
         console.log(this.state.turn);
@@ -45,6 +50,13 @@ class App extends Component {
       else if (this.state.turn < 1000) {
         setTimeout(this.doTurn, 100);
       }
+    });
+  }
+
+  _viewTurn = (event) => {
+    this.setState({
+      viewingTurn: event.target.value,
+      gameState: this.state.history[event.target.value]
     });
   }
 
@@ -77,7 +89,7 @@ class App extends Component {
     ))
     return (
       <div>
-        <h1>Turn: {this.state.turn}</h1>
+        <h1>Turn: <input type="number" min={0} max={this.state.turn} value={this.state.viewingTurn} onChange={this._viewTurn} /></h1>
         <div style={{ width: BOARD_WIDTH * 20, position: "relative", margin: "auto" }} >
           {boards}
           {playerIcon}
