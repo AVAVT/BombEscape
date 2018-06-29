@@ -1,28 +1,11 @@
+import { Directions } from './controller';
+
 const BOARD_WIDTH = 31;
 const BOARD_HEIGHT = 31;
 const MIN_BOMBS_PER_TURN = 3;
 const DIFFICULTY_INCREASE_INTERVAL = 7;
 
-const Directions = {
-  UP: "UP",
-  DOWN: "DOWN",
-  LEFT: "LEFT",
-  RIGHT: "RIGHT",
-  STAY: "STAY"
-}
-
-const initialState = {
-  boardWidth: BOARD_WIDTH,
-  boardHeight: BOARD_HEIGHT,
-  playerPosition: {
-    x: BOARD_WIDTH / 2,
-    y: BOARD_HEIGHT / 2
-  },
-  bombs: [],
-  gameOver: false
-}
-
-const update = (gameState, turn, move = Directions.STAY) => {
+export const update = (gameState, turn, move = Directions.STAY) => {
   const newPlayerPos = doMove(gameState.playerPosition, move);
   const tickBombs = gameState.bombs
     .filter(
@@ -32,7 +15,7 @@ const update = (gameState, turn, move = Directions.STAY) => {
       b => Object.assign({}, b, { timer: b.timer - 1 })
     );
 
-  const newBombs = [...tickBombs, ...createBombs(tickBombs, MIN_BOMBS_PER_TURN + turn / DIFFICULTY_INCREASE_INTERVAL, BOARD_WIDTH, BOARD_HEIGHT)];
+  const newBombs = [...tickBombs, ...createBombs(tickBombs, newPlayerPos, MIN_BOMBS_PER_TURN + turn / DIFFICULTY_INCREASE_INTERVAL, BOARD_WIDTH, BOARD_HEIGHT)];
 
   const gameOver = newBombs.some(bomb => bomb.x === newPlayerPos.x && bomb.y === newPlayerPos.y) || newBombs.filter(bomb => bomb.timer === 0).some(bomb => Math.abs(bomb.x - newPlayerPos.x) + Math.abs(bomb.y - newPlayerPos.y) <= 2);
 
@@ -72,7 +55,7 @@ const createBombs = (currentBombs, playerPos, numberToCreate, boardWidth, boardH
     .map((item, index) => ({
       timer: 2,
       x: index % boardWidth,
-      y: index / boardWidth
+      y: Math.floor(index / boardWidth)
     }))
     .filter(
       position => currentBombs.every(bomb => bomb.x !== position.x && bomb.y !== position.y) && playerPos.x !== position.x && playerPos.y !== position.y
@@ -98,20 +81,3 @@ function knuthShuffle(array) {
 
   return array;
 }
-
-
-const randomInt = (max, min) => Math.floor(Math.random() * (max - min) + min);
-
-const doGame = (gameState = initialState, turn = 0) => {
-  while (!gameState.gameOver && turn < 1000) {
-    gameState = update(gameState, turn, doTurn(gameState));
-    if (gameState.gameOver) {
-      alert("Gameover at turn " + turn);
-    }
-    turn++;
-  }
-}
-
-const startGame = () => doGame();
-
-window.onload = startGame;

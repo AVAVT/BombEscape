@@ -1,11 +1,10 @@
-// const Directions = {
-//   UP: "UP",
-//   DOWN: "DOWN",
-//   LEFT: "LEFT",
-//   RIGHT: "RIGHT",
-//   STAY: "STAY"
-// }
-
+export const Directions = {
+  UP: "UP",
+  DOWN: "DOWN",
+  LEFT: "LEFT",
+  RIGHT: "RIGHT",
+  STAY: "STAY"
+}
 
 // const initialState = {
 //   boardWidth: 31,
@@ -24,6 +23,6 @@
 //   gameOver: false
 // }
 
-const doTurn = (gameState) => {
+export const doTurn = (gameState) => {
   return Directions.STAY;
 }
